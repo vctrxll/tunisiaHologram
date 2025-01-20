@@ -1,0 +1,8 @@
+venv/
+dist/
+__pycache__
+assets/
+__pycache__/
+.idea/
+build/
+icon.ico

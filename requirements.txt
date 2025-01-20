@@ -1,0 +1,5 @@
+opencv-python
+mediapipe
+open3d
+pygame
+pygetwindow
