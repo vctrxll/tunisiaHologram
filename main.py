@@ -8,6 +8,9 @@ import time
 import subprocess
 import pygame
 import pygetwindow as gw
+import pygame
+import numpy as np
+import pygetwindow as gw
 
 pygame.init()
 
@@ -272,7 +275,7 @@ def detect_finger_down(hand_landmarks):
     print("Pinky ", d_base_pinky)
     print("Anular ", d_base_anular)
     print("Medio ", d_base_medio)
-    if d_base_anular < 37 and d_base_medio < 37 and d_base_pinky < 37:
+    if d_base_anular < 65 and d_base_medio < 65 and d_base_pinky < 65:
         finger_down = True
     print("---------------------")
     return finger_down
@@ -329,8 +332,8 @@ with mp_hands.Hands(
                     counterMenu = 1
                     if open3d and menu:
                         #print("Abrir ventana del menu")
-                        open3d[0].minimize()
-                        open3d[0].maximize()
+                        #open3d[0].minimize()
+                        #open3d[0].maximize()
                         menu[0].activate()
                         menu[0].show()
 
