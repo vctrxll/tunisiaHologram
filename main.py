@@ -492,7 +492,7 @@ with mp_hands.Hands(
                                     print("Max reached: " + str(deltaX) + "," + str(deltaY))
                                 else:
                                     # print(str(deltaX) + "," + str(deltaY))
-                                    vis.get_view_control().rotate(deltaX * 8, -deltaY * 8, xo=0.0, yo=0.0)
+                                    vis.get_view_control().rotate(-deltaX * 8, -deltaY * 8, xo=0.0, yo=0.0)
                                     vis.poll_events()
                                     vis.update_renderer()
                                 # Si la distancia es menor que 50, mueve la vista del modelo 3D de acuerdo con los movimientos detectados.
