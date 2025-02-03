@@ -11,9 +11,22 @@ import pygetwindow as gw
 import pygame
 import numpy as np
 import pygetwindow as gw
+import tkinter as tk
+from tkinter import ttk
 
 pygame.init()
 
+# Diccionario de subtítulos en inglés
+subtitles_en = {
+    0: "Phoenician glass pendant",
+    1: "Herma with bust of Bacchus", 
+    2: "Punic pendant",
+    3: "Punic clay jar",
+    4: "Ancient three-disk shield",
+    5: "Piece 8",
+    6: "Piece 10",
+    7: "Piece 6"
+}
 
 touchcaps = [
     {
@@ -139,6 +152,10 @@ isFullscreen = True
 
 pieceTime = 0
 
+# Agregar variables globales
+show_subtitles = False
+current_subtitle_index = 0
+
 
 # Cargar el modelo 3D
 mesh = o3d.io.read_triangle_mesh(
@@ -216,30 +233,91 @@ def calc_distance(p1, p2):
         (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
     )  # Calcula la distancia euclidiana entre dos puntos p1 y p2.
 
+
+def create_subtitle_window():
+    """ Crea una ventana sin bordes que se mantiene sobre la ventana 3D para mostrar subtítulos. """
+    subtitle_window = tk.Toplevel()  # Crear una ventana secundaria (NO principal)
+    subtitle_window.overrideredirect(True)  # Eliminar bordes y título
+    subtitle_window.configure(bg="black")  # Fondo negro
+    subtitle_window.attributes('-topmost', True)  # Mantener la ventana SIEMPRE al frente
+    subtitle_window.attributes('-transparentcolor', 'black')  # Permitir transparencia del fondo negro
+
+    # Posiciona en la parte inferior de la pantalla
+    screen_width = subtitle_window.winfo_screenwidth()
+    screen_height = subtitle_window.winfo_screenheight()
+    subtitle_window.geometry(f"800x60+{(screen_width - 800) // 2}+{screen_height - 80}")
+
+    # Crear la etiqueta de los subtítulos
+    subtitle_label = tk.Label(
+        subtitle_window,
+        text="",
+        font=("Arial", 24, "bold"),
+        background="black",
+        foreground="white",
+        wraplength=780,
+        anchor="center"
+    )
+    subtitle_label.pack(expand=True, fill="both")
+
+    subtitle_window.withdraw()  # Ocultar al inicio
+
+    return subtitle_window, subtitle_label
+
+# Ocultar la ventana principal de Tkinter para evitar la ventana blanca "tk"
+root = tk.Tk()
+root.withdraw()
+
+# Crear la ventana de subtítulos
+subtitle_window, subtitle_label = create_subtitle_window()
+
 def cambiarObj(vis, modelo_viejo, objectreadfile):
+    global current_subtitle_index, language, show_subtitles
+
     if objectreadfile in archivos.values():
         current_index = list(archivos.values()).index(objectreadfile)
         next_index = (current_index + 1) % len(archivos)
+        current_subtitle_index = next_index
+
         if current_index == 0:
             pygame.mixer.music.stop()
         audios_cargados[current_index].stop()
         audios_cargados[next_index].play()
         objectreadfile = list(archivos.values())[next_index]
-        audioreadfile = list(archivos.values())[next_index]
+
+        # 🔹 Mostrar y actualizar subtítulos en cada cambio
+        if language == "Ingles":
+            show_subtitles = True
+            subtitle_window.deiconify()  # Asegurar que la ventana aparece
+            subtitle_text = subtitles_en.get(next_index, "No subtitles available")
+            subtitle_label.config(text=subtitle_text)  # Actualizar subtítulo
+            subtitle_window.update_idletasks()
+
     else:
         objectreadfile = list(archivos.values())[0]
+        current_subtitle_index = 0
         audios_cargados[0].play()
 
+        # 🔹 Asegurar que el subtítulo aparece desde la primera pieza
+        if language == "Ingles":
+            show_subtitles = True
+            subtitle_window.deiconify()
+            subtitle_label.config(text=subtitles_en.get(0, "No subtitles available"))
+            subtitle_window.update_idletasks()
+
+    # 🔹 Asegurar que el subtítulo aparece al inicio
+    if language == "Ingles" and not show_subtitles:
+        subtitle_window.deiconify()
+        show_subtitles = True
+
+    # Cambiar modelo en Open3D
     meshNew = o3d.io.read_triangle_mesh(objectreadfile, True)
     vis.remove_geometry(modelo_viejo)
     vis.add_geometry(meshNew)
     vis.get_view_control().set_zoom(0.7)
-    # vis.get_view_control().rotate(300, 1200, xo=0.0, yo=0.0)  # Rota la vista del modelo 3D.
-    # vis.get_view_control().rotate(1000, 0, xo=0.0, yo=0.0)  # Rota la vista del modelo 3D.
-    vis.poll_events()  # Procesa los eventos de la ventana.
-    vis.update_renderer()  # Actualiza el renderizador.
-    print(f" Pieza cambiada a '{objectreadfile}'")
-    # print(f" audio en reproduccion '{audioreadfile}'")
+    vis.poll_events()
+    vis.update_renderer()
+
+    print(f"Pieza cambiada a '{objectreadfile}'")
     return objectreadfile, meshNew
 
 
@@ -297,7 +375,7 @@ with mp_hands.Hands(
     min_tracking_confidence=0.9,
 ) as hands:
     # Inicia el contexto del modelo de manos de MediaPipe con una confianza mínima de detección de 0.8 y una confianza mínima de seguimiento de 0.5.
-
+    subtitle_window, subtitle_label = create_subtitle_window()
     while cap.isOpened():
         # Bucle que se ejecuta mientras la cámara esté abierta.
         ret, frame = cap.read()
@@ -396,23 +474,29 @@ with mp_hands.Hands(
                             )
 
                             # Si han pasado 3 segundos, imprimir el comando una sola vez
-                            if elapsed_time >= 5:
-                                #print(r["title"])
+                            if elapsed_time >= 3:
                                 language = r["title"]
+                                show_subtitles = language == "Ingles"  # Mostrar solo si el idioma es inglés
+
+                                if language != "Ingles":
+                                    subtitle_window.withdraw()  # 🔹 Ocultar subtítulos si el idioma no es inglés
 
                                 audios = audios_por_idioma.get(language, {})
                                 audios_cargados = {k: pygame.mixer.Sound(v) for k, v in audios.items()}
-                                # Imprimir confirmación de carga
                                 print(f"Audios cargados para el idioma: {language}")
 
-                                objectreadfile, meshNew = cambiarObj(vis=vis, modelo_viejo=mesh,
-                                                                     objectreadfile=objectreadfile)
+                                if show_subtitles:
+                                    subtitle_window.deiconify()  # Mostrar ventana de subtítulos
+                                else:
+                                    subtitle_window.withdraw()  # Ocultar ventana de subtítulos si no es inglés
+
+                                objectreadfile, meshNew = cambiarObj(vis=vis, modelo_viejo=mesh, objectreadfile=objectreadfile)
                                 mesh = meshNew
                                 r["detected"] = False
                                 r["timer"] = None
                                 menu[0].hide()
-                                #print("cerrar ventada")
                                 initialState = False
+
                         else:
                             # Si el índice sale de la región, se reinicia la detección
                             r["detected"] = False
@@ -588,6 +672,9 @@ with mp_hands.Hands(
                     for key in audios:
                         pygame.mixer.music.stop()
                         audios_cargados[key].stop()
+                    if show_subtitles:
+                        cv2.destroyWindow("Subtitles")
+                        show_subtitles = False
                     vis.remove_geometry(mesh)
                     audios_cargados = None
                     objectreadfile = os.path.join(INICIO_PATH, "Green_Circle_0915213601.obj")
@@ -624,3 +711,6 @@ with mp_hands.Hands(
 cap.release()
 vis.destroy_window()
 cv2.destroyAllWindows()
+# Al final del archivo, agregar:
+subtitle_window.mainloop()
+subtitle_window.destroy()  # Cerrar la ventana de subtítulos
