@@ -621,6 +621,12 @@ with mp_hands.Hands(
                     downtime = 0
                     initialState = True
                     counterMenu = 0
+                    subtitulos = gw.getWindowsWithTitle("pygame window")
+                    if subtitulos:
+                        pygame_window = subtitulos[0]  # Si hay múltiples ventanas, tomamos la primera
+                        pygame_window.close()
+                    else:
+                        print("No se encontró una ventana llamada 'pygame window'.")
                     print("Regresar inicio")
                 else:
                     downtime += 1
