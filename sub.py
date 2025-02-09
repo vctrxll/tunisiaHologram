@@ -1,8 +1,6 @@
-import cv2
 import pygame
 import time
-import numpy as np
-import pygetwindow as gw
+import os
 
 # Inicializar pygame y cargar un audio de prueba
 pygame.init()
@@ -14,32 +12,33 @@ font = pygame.font.SysFont("Arial", 40)
 def create_subtitle_window():
     text_surface = font.render("Cargando...", True, (255, 255, 255))
     text_width, text_height = text_surface.get_size()
-    return pygame.display.set_mode((text_width + 900, text_height + 20), pygame.NOFRAME)
+    return pygame.display.set_mode((text_width + 1200, text_height + 20), pygame.NOFRAME)
 
 
+os.environ['SDL_VIDEO_WINDOW_POS'] = "50,770"  # Ajusta las coordenadas según necesidad
 screen = create_subtitle_window()
-audio_path = "AUDIOS/ESPANOL/COLGANTE PUNICO.mp3"
+
+
+audio_path = "AUDIOS/ESPANOL/PEDANTE FENICIO DE CRISTAL.mp3"
 audio = pygame.mixer.Sound(audio_path)
 audio_length = audio.get_length()
 
 # Diccionario con subtítulos sincronizados
 dialogue = {
-    0: "Aquí tenemos un colgante púnico de vidrio de Cartago...",
-    5: "... que representa a Baal, también conocido como Melkart, Herakles y Hércules.",
-    10: "Descubierto en una antigua fosa de basura de la ciudad íbera de Alon...",
-    15: "... este raro hallazgo es uno de los pocos ejemplares encontrados en la Península Ibérica.",
-    20: "El amuleto de 5 cm destaca por sus grandes ojos abiertos...",
-    25: "... diseñados para repeler el 'mal de ojo' y subraya la importancia de Baal en el panteón cartaginés.",
-    30: "Refleja creencias y prácticas culturales antiguas.",
-    35: "Este colgante demuestra la habilidad de los artesanos púnicos en el trabajo del vidrio...",
-    40: "... y también representa creencias religiosas y prácticas espirituales de Cartago.",
-    45: "Destaca la importancia del simbolismo y la indumentaria en su cultura.",
-    50: "Su inesperado descubrimiento es un valioso testimonio...",
-    55: "... de la rica historia y del legado cultural de Cartago."
-}
+    0: "Aquí tenemos un pedante fenicio de cristal en forma de cabeza barbuda...",
+    5: "... originario de Cartago y datado en los siglos IV a III a.C.",
 
-# Iniciar la reproducción del audio
-audio.play()
+    10: "Actualmente, esta pieza está expuesta en el Museo Nacional del Bardo en Túnez...",
+    15: "... y es un ejemplo exquisito de la maestría en el trabajo del vidrio de los fenicios.",
+    20: "Una técnica que alcanzaron con gran perfección...",
+    25: "... y que refleja la sofisticación de su cultura.",
+    30: "La representación de la barba puede indicar sabiduría o autoridad...",
+    35: "... rasgos valorados en muchas culturas antiguas.",
+    40: "Este colgante no solo demuestra la habilidad artesanal fenicia...",
+    45: "... sino que también ofrece una ventana a las prácticas espirituales y la vida cotidiana en la antigua Cartago.",
+    50: "Revela la importancia de los amuletos y la simbología religiosa en esta civilización marítima avanzada...",
+    55: "... sirviendo como un puente entre el pasado remoto y el presente."
+    }
 
 start_time = time.time()
 running = True
