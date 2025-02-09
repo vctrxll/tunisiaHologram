@@ -19,25 +19,24 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "50,770"  # Ajusta las coordenadas según n
 screen = create_subtitle_window()
 
 
-audio_path = "AUDIOS/ESPANOL/PEDANTE FENICIO DE CRISTAL.mp3"
+audio_path = "../../AUDIOS/ESPANOL/JARRO DE ARCILLA PÚNICO.mp3"
 audio = pygame.mixer.Sound(audio_path)
 audio_length = audio.get_length()
 
 # Diccionario con subtítulos sincronizados
 dialogue = {
-    0: "Aquí tenemos un pedante fenicio de cristal en forma de cabeza barbuda...",
-    5: "... originario de Cartago y datado en los siglos IV a III a.C.",
-
-    10: "Actualmente, esta pieza está expuesta en el Museo Nacional del Bardo en Túnez...",
-    15: "... y es un ejemplo exquisito de la maestría en el trabajo del vidrio de los fenicios.",
-    20: "Una técnica que alcanzaron con gran perfección...",
-    25: "... y que refleja la sofisticación de su cultura.",
-    30: "La representación de la barba puede indicar sabiduría o autoridad...",
-    35: "... rasgos valorados en muchas culturas antiguas.",
-    40: "Este colgante no solo demuestra la habilidad artesanal fenicia...",
-    45: "... sino que también ofrece una ventana a las prácticas espirituales y la vida cotidiana en la antigua Cartago.",
-    50: "Revela la importancia de los amuletos y la simbología religiosa en esta civilización marítima avanzada...",
-    55: "... sirviendo como un puente entre el pasado remoto y el presente."
+        0: "Aquí tenemos un jarro de arcilla púnico...",
+        5: "... un artefacto representativo del arte y la utilidad en la antigua civilización cartaginense.",
+        10: "Este recipiente, moldeado meticulosamente con arcilla local...",
+        15: "... destaca por su diseño robusto y funcional.",
+        20: "Típicamente utilizado para el almacenamiento y transporte de alimentos y líquidos...",
+        25: "... esencial para el comercio marítimo y la vida cotidiana púnica.",
+        30: "El jarro refleja la pericia técnica de los artesanos púnicos en cerámica...",
+        35: "... conocidos por su habilidad para crear objetos duraderos y estéticamente agradables.",
+        40: "Su forma y material nos ofrecen una ventana al pasado...",
+        45: "... revelando detalles sobre las prácticas diarias y económicas de Cartago.",
+        50: "Este jarro no solo es un testimonio de la vida diaria...",
+        55: "... sino también un vestigio de las rutas comerciales del Mediterráneo antiguo."
     }
 
 start_time = time.time()

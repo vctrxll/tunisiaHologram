@@ -135,7 +135,7 @@ cap_height = 720
 isFullscreen = True
 
 pieceTime = 0
-
+global sub
 
 # Cargar el modelo 3D
 mesh = o3d.io.read_triangle_mesh(
@@ -156,6 +156,7 @@ cv2.namedWindow("Idiomas", cv2.WND_PROP_FULLSCREEN)
 
 open3d = gw.getWindowsWithTitle("Open3D")  # Ejemplo con Notepad
 menu = gw.getWindowsWithTitle("Idiomas")
+
 
 
 if platform.system() == "Linux":
@@ -213,20 +214,42 @@ def calc_distance(p1, p2):
         (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
     )  # Calcula la distancia euclidiana entre dos puntos p1 y p2.
 
+
 def cambiarObj(vis, modelo_viejo, objectreadfile):
+    if language == "Espanol":
+        directorio = os.path.join(os.getcwd(), 'sub', 'espanol')
+    elif language == "Ingles":
+        directorio = os.path.join(os.getcwd(), 'sub', 'ingles')
+
     if objectreadfile in archivos.values():
         current_index = list(archivos.values()).index(objectreadfile)
         next_index = (current_index + 1) % len(archivos)
         if current_index == 0:
             pygame.mixer.music.stop()
         audios_cargados[current_index].stop()
+
+        if language == "Espanol" or language == "Ingles":
+            subtitulos = gw.getWindowsWithTitle("pygame window")
+            if subtitulos:
+                pygame_window = subtitulos[0]  # Si hay múltiples ventanas, tomamos la primera
+                pygame_window.close()
+            else:
+                print("No se encontró una ventana llamada 'pygame window'.")
+            # -------------------
+            script = f"{next_index}.py"
+            # Ejecutar el archivo .py con Popen
+            proces = subprocess.Popen(['python', script], cwd=directorio)
+
         audios_cargados[next_index].play()
         objectreadfile = list(archivos.values())[next_index]
         audioreadfile = list(archivos.values())[next_index]
     else:
         objectreadfile = list(archivos.values())[0]
         audios_cargados[0].play()
-        subprocess.Popen(["python", "sub.py"])
+        if language == "Espanol" or language == "Ingles":
+            # -------------------
+            # Ejecutar el archivo .py con Popen
+            proces = subprocess.Popen(['python', "0.py"], cwd=directorio)
 
     meshNew = o3d.io.read_triangle_mesh(objectreadfile, True)
     vis.remove_geometry(modelo_viejo)
@@ -236,7 +259,7 @@ def cambiarObj(vis, modelo_viejo, objectreadfile):
     # vis.get_view_control().rotate(1000, 0, xo=0.0, yo=0.0)  # Rota la vista del modelo 3D.
     vis.poll_events()  # Procesa los eventos de la ventana.
     vis.update_renderer()  # Actualiza el renderizador.
-    print(f" Pieza cambiada a '{objectreadfile}s'")
+    print(f" Pieza cambiada a '{objectreadfile}'")
     # print(f" audio en reproduccion '{audioreadfile}'")
     return objectreadfile, meshNew
 
